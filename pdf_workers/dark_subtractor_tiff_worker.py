@@ -158,7 +158,7 @@ from pathlib import Path
 
 ##def export_subtracted_tiff_series(header, file_path, *args, **kwargs):
 def export_subtracted_tiff_series(name, doc, export_dir):
-
+    print(f"export_subtracted_tiff_series name: {name}")
     out = []
     subtractor = DarkSubtraction("pe1c_image")
     my_samplename = None
