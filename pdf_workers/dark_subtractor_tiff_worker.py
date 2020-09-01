@@ -157,19 +157,18 @@ from pathlib import Path
 
 
 ##def export_subtracted_tiff_series(header, file_path, *args, **kwargs):
-def export_subtracted_tiff_series(name, doc, export_dir):
+def export_subtracted_tiff_series(name, doc, export_dir, my_sample_name):
     print(f"export_subtracted_tiff_series name: {name}")
-    print(f"doc: {doc['data']}")
     out = []
     subtractor = DarkSubtraction("pe1c_image")
-    my_samplename = None
+    ##my_samplename = None
     file_written_list = []
     export_dir_path = Path(export_dir)
     export_dir_path.mkdir(parents=True, exist_ok=True)
     ##for name, doc in header.documents(fill=True):
     name, doc = subtractor(name, doc)
-    if name == "start":
-        my_samplename = doc["md"]
+    ##if name == "start":
+    ##    my_samplename = doc["md"]
 
     if name == "event":
         # if 'pe1c_is_background_subtracted' in doc['data']:
@@ -197,10 +196,12 @@ def export_subtracted_tiff_series(name, doc, export_dir):
                     )
                 },
             }
-            this_filename = my_filename(out, my_samplename, doc["seq_num"])
+            this_filename = my_filename(out, my_sample_name, doc["seq_num"])
             file_written_list.append(this_filename)
             print("\nwheee " + str(this_filename))
-            imsave(str(export_dir_path / this_filename), data=out["image"].astype("int32"))
+            imsave(
+                str(export_dir_path / this_filename), data=out["image"].astype("int32")
+            )
             # break #remove later
     return file_written_list
 
@@ -233,14 +234,21 @@ def main():
 
 
 def start(export_dir, kafka_bootstrap_servers, kafka_topics):
-    def factory(name, start_doc, export_dir):
-        return [partial(export_subtracted_tiff_series, export_dir=export_dir)], []
+    def factory(name, start_doc, export_dir, my_sample_name):
+        my_sample_name = start_doc["md"]
+        return [
+            partial(
+                export_subtracted_tiff_series,
+                export_dir=export_dir,
+                my_sample_name=my_sample_name,
+            )
+        ], []
 
     dispatcher = bluesky_kafka.RemoteDispatcher(
         topics=kafka_topics,
         group_id="pdf-dark-subtractor-tiff-worker",
         bootstrap_servers=kafka_bootstrap_servers,
-        deserializer=msgpack.loads
+        deserializer=msgpack.loads,
     )
 
     rr = RunRouter(
