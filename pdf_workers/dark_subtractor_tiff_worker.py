@@ -235,13 +235,13 @@ def main():
 
 
 def start(export_dir, kafka_bootstrap_servers, kafka_topics):
-    def factory(name, start_doc, export_dir_):
+    def factory(name, start_doc, export_dir):
         my_sample_name = start_doc["md"]
         subtractor = DarkSubtraction("pe1c_image")
         return [
             partial(
                 export_subtracted_tiff_series,
-                export_dir=export_dir_,
+                export_dir=export_dir,
                 my_sample_name=my_sample_name,
                 subtractor=subtractor
             )
