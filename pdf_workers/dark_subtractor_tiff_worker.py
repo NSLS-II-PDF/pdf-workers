@@ -234,7 +234,7 @@ def main():
 
 
 def start(export_dir, kafka_bootstrap_servers, kafka_topics):
-    def factory(name, start_doc, export_dir, my_sample_name):
+    def factory(name, start_doc, export_dir):
         my_sample_name = start_doc["md"]
         return [
             partial(
