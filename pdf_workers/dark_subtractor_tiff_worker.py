@@ -2,6 +2,9 @@ import argparse
 from functools import partial
 import pprint
 
+import msgpack
+import msgpack_numpy as mpn
+
 import bluesky_kafka
 import databroker
 from event_model import RunRouter
@@ -13,6 +16,10 @@ import event_model
 import copy
 import time
 import numpy
+
+# mpn.patch() is recommended by msgpack-numpy
+# as the way to patch msgpack for numpy
+mpn.patch()
 
 
 class DarkSubtraction(event_model.DocumentRouter):
@@ -232,6 +239,7 @@ def start(export_dir, kafka_bootstrap_servers, kafka_topics):
         topics=kafka_topics,
         group_id="pdf-dark-subtractor-tiff-worker",
         bootstrap_servers=kafka_bootstrap_servers,
+        deserializer=msgpack.loads
     )
 
     rr = RunRouter(
