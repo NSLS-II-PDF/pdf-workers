@@ -2,6 +2,8 @@ bluesky
 bluesky-kafka
 databroker
 event-model
+msgpack >=1.0.0
+msgpack-numpy
 numpy
 ophyd
 pymongo
