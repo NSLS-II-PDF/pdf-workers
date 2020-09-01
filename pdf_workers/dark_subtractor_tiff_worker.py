@@ -163,7 +163,7 @@ def export_subtracted_tiff_series(name, doc, export_dir, my_sample_name):
     subtractor = DarkSubtraction("pe1c_image")
     ##my_samplename = None
     file_written_list = []
-    export_dir_path = Path(export_dir)
+    export_dir_path = Path(export_dir) / Path(my_sample_name)
     export_dir_path.mkdir(parents=True, exist_ok=True)
     ##for name, doc in header.documents(fill=True):
     name, doc = subtractor(name, doc)
