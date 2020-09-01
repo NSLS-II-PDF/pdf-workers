@@ -7,7 +7,7 @@ import msgpack_numpy as mpn
 
 import bluesky_kafka
 import databroker
-from event_model import RunRouter
+from event_model import RunRouter, unpack_event_page
 import ophyd.sim
 
 
@@ -170,39 +170,40 @@ def export_subtracted_tiff_series(name, doc, export_dir, my_sample_name):
     ##if name == "start":
     ##    my_samplename = doc["md"]
 
-    if name == "event":
-        # if 'pe1c_is_background_subtracted' in doc['data']:
-        if "Grid_Y" in doc["data"]:
-            # print(list(doc['data']))
+    if name == "event_page":
+        for event_doc in unpack_event_page(doc):
+            # if 'pe1c_is_background_subtracted' in doc['data']:
+            if "Grid_Y" in event_doc["data"]:
+                # print(list(doc['data']))
 
-            # out.append({'image': doc['data']['pe1c_image'],
-            #         'center_Grid_X': (doc['data']['start_Grid_X'] + doc['data']['stop_Grid_X']) / 2,
-            #         **{k: doc['data'][k] for k in ('start_Grid_X', 'stop_Grid_X', 'Grid_Y','pe1c_stats1_total')}})
-            # def my_filename(out, my_samplename, my_iter):
+                # out.append({'image': doc['data']['pe1c_image'],
+                #         'center_Grid_X': (doc['data']['start_Grid_X'] + doc['data']['stop_Grid_X']) / 2,
+                #         **{k: doc['data'][k] for k in ('start_Grid_X', 'stop_Grid_X', 'Grid_Y','pe1c_stats1_total')}})
+                # def my_filename(out, my_samplename, my_iter):
 
-            out = {
-                "image": doc["data"]["pe1c_image"],
-                "center_Grid_X": (
-                    doc["data"]["start_Grid_X"] + doc["data"]["stop_Grid_X"]
-                )
-                / 2,
-                **{
-                    k: doc["data"][k]
-                    for k in (
-                        "start_Grid_X",
-                        "stop_Grid_X",
-                        "Grid_Y",
-                        "pe1c_stats1_total",
+                out = {
+                    "image": event_doc["data"]["pe1c_image"],
+                    "center_Grid_X": (
+                        event_doc["data"]["start_Grid_X"] + event_doc["data"]["stop_Grid_X"]
                     )
-                },
-            }
-            this_filename = my_filename(out, my_sample_name, doc["seq_num"])
-            file_written_list.append(this_filename)
-            print("\nwheee " + str(this_filename))
-            imsave(
-                str(export_dir_path / this_filename), data=out["image"].astype("int32")
-            )
-            # break #remove later
+                    / 2,
+                    **{
+                        k: event_doc["data"][k]
+                        for k in (
+                            "start_Grid_X",
+                            "stop_Grid_X",
+                            "Grid_Y",
+                            "pe1c_stats1_total",
+                        )
+                    },
+                }
+                this_filename = my_filename(out, my_sample_name, event_doc["seq_num"])
+                file_written_list.append(this_filename)
+                print("\nwheee " + str(this_filename))
+                imsave(
+                    str(export_dir_path / this_filename), data=out["image"].astype("int32")
+                )
+                # break #remove later
     return file_written_list
 
 
