@@ -233,7 +233,7 @@ def main():
 
 def start(export_dir, kafka_bootstrap_servers, kafka_topics):
     def factory(name, start_doc, export_dir):
-        return [partial(export_subtracted_tiff_series, file_path=export_dir)], []
+        return [partial(export_subtracted_tiff_series, export_dir=export_dir)], []
 
     dispatcher = bluesky_kafka.RemoteDispatcher(
         topics=kafka_topics,
