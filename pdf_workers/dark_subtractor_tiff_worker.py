@@ -157,10 +157,10 @@ from pathlib import Path
 
 
 ##def export_subtracted_tiff_series(header, file_path, *args, **kwargs):
-def export_subtracted_tiff_series(name, doc, export_dir, my_sample_name):
+def export_subtracted_tiff_series(name, doc, export_dir, my_sample_name, subtractor):
     print(f"export_subtracted_tiff_series name: {name}")
     out = []
-    subtractor = DarkSubtraction("pe1c_image")
+    ##subtractor = DarkSubtraction("pe1c_image")
     ##my_samplename = None
     file_written_list = []
     export_dir_path = Path(export_dir) / Path(my_sample_name)
@@ -235,13 +235,15 @@ def main():
 
 
 def start(export_dir, kafka_bootstrap_servers, kafka_topics):
-    def factory(name, start_doc, export_dir):
+    def factory(name, start_doc, export_dir_):
         my_sample_name = start_doc["md"]
+        subtractor = DarkSubtraction("pe1c_image")
         return [
             partial(
                 export_subtracted_tiff_series,
-                export_dir=export_dir,
+                export_dir=export_dir_,
                 my_sample_name=my_sample_name,
+                subtractor=subtractor
             )
         ], []
 
